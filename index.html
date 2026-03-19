@@ -115,24 +115,19 @@ alert.classList.remove("show")
 
 }
 
+<script>
+
 /* TEST FUNCTIONS */
 
 window.testFollow = function(){
-
 showAlert("New follower: ShawtyFan 💗")
-
 }
 
 window.testGift = function(){
-
 showAlert("ShawtyFan sent Rose x3 🎁")
-
 }
 
-</script>
-
-</body>
-</html>
+/* TOP GIFTER UPDATE */
 
 setInterval(()=>{
 
@@ -140,8 +135,15 @@ let name = localStorage.getItem("topgifter")
 let count = localStorage.getItem("topgiftcount")
 
 if(name){
-document.getElementById("gifterName").innerText=name
-document.getElementById("gifterCount").innerText=count
+
+document.getElementById("gifterName").innerText = name
+document.getElementById("gifterCount").innerText = count
+
 }
 
 },1000)
+
+</script>
+
+</body>
+</html>
