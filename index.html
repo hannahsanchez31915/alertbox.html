@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
-<title>Prxttysiren Alert</title>
+<title>Prxttysiren Alerts</title>
 
 <style>
 
@@ -20,32 +21,30 @@ font-family:"Trebuchet MS",sans-serif;
 overflow:hidden;
 }
 
-/* ALERT CONTAINER */
+/* ALERT BOX */
 
 .alert{
 
 position:absolute;
-bottom:80px;
+bottom:120px;
 left:50%;
 transform:translateX(-50%) scale(.8);
 
 background:linear-gradient(180deg,var(--pink1),var(--pink2));
 
 border-radius:25px;
-
-padding:18px 30px;
+padding:18px 35px;
 
 border:2px solid white;
 
-box-shadow:0 0 20px rgba(255,140,200,.4);
+box-shadow:0 0 25px rgba(255,120,180,.5);
 
-font-size:24px;
+font-size:26px;
 font-weight:900;
 
 color:var(--pink4);
 
 opacity:0;
-
 transition:all .5s ease;
 
 }
@@ -59,15 +58,17 @@ transform:translateX(-50%) scale(1);
 
 }
 
-/* HEART SPARKLES */
+/* SPARKLES */
 
 .sparkles{
 
 position:absolute;
-top:-10px;
+top:-12px;
 left:0;
 right:0;
+
 text-align:center;
+
 font-size:22px;
 opacity:.7;
 
@@ -96,6 +97,13 @@ animation:sparkle 1.2s infinite;
 
 </div>
 
+<!-- hidden data elements -->
+
+<div style="display:none">
+<span id="gifterName"></span>
+<span id="gifterCount"></span>
+</div>
+
 <script>
 
 /* SHOW ALERT */
@@ -115,19 +123,97 @@ alert.classList.remove("show")
 
 }
 
-<script>
+/* CONNECT TO TIKFINITY */
 
-/* TEST FUNCTIONS */
+try{
 
-window.testFollow = function(){
-showAlert("New follower: ShawtyFan 💗")
+const socket = new WebSocket("ws://localhost:21213/")
+
+socket.onopen = ()=>{
+console.log("Connected to TikFinity")
 }
 
-window.testGift = function(){
-showAlert("ShawtyFan sent Rose x3 🎁")
+socket.onmessage = (event)=>{
+
+let msg = JSON.parse(event.data)
+
+console.log(msg)
+
+/* FOLLOW */
+
+if(msg.event === "follow"){
+
+showAlert(msg.data.nickname + " followed 💗")
+
 }
 
-/* TOP GIFTER UPDATE */
+/* GIFT */
+
+if(msg.event === "gift"){
+
+let user = msg.data.nickname
+let gift = msg.data.giftName
+let amount = msg.data.repeatCount
+
+showAlert(user + " sent " + gift + " x" + amount + " 🎁")
+
+updateTopGifter(user,amount)
+
+}
+
+/* LIKE */
+
+if(msg.event === "like"){
+
+showAlert(msg.data.nickname + " liked the stream 👍")
+
+}
+
+/* SHARE */
+
+if(msg.event === "share"){
+
+showAlert(msg.data.nickname + " shared the stream 🔄")
+
+}
+
+/* USER JOIN */
+
+if(msg.event === "roomUser"){
+
+showAlert(msg.data.nickname + " joined 💬")
+
+}
+
+}
+
+}catch(e){
+
+console.log("TikFinity not connected yet")
+
+}
+
+/* TOP GIFTER SYSTEM */
+
+let gifterScores = {}
+
+function updateTopGifter(user,amount){
+
+if(!gifterScores[user]){
+gifterScores[user]=0
+}
+
+gifterScores[user]+=amount
+
+let top = Object.keys(gifterScores).reduce((a,b)=>
+gifterScores[a] > gifterScores[b] ? a : b)
+
+localStorage.setItem("topgifter",top)
+localStorage.setItem("topgiftcount",gifterScores[top])
+
+}
+
+/* UPDATE TOP GIFTER DISPLAY */
 
 setInterval(()=>{
 
@@ -136,12 +222,25 @@ let count = localStorage.getItem("topgiftcount")
 
 if(name){
 
-document.getElementById("gifterName").innerText = name
-document.getElementById("gifterCount").innerText = count
+let nameBox = document.getElementById("gifterName")
+let countBox = document.getElementById("gifterCount")
+
+if(nameBox) nameBox.innerText=name
+if(countBox) countBox.innerText=count
 
 }
 
 },1000)
+
+/* TEST COMMANDS */
+
+window.testFollow = ()=>{
+showAlert("New follower: ShawtyFan 💗")
+}
+
+window.testGift = ()=>{
+showAlert("ShawtyFan sent Rose x3 🎁")
+}
 
 </script>
 
