@@ -133,3 +133,15 @@ showAlert("ShawtyFan sent Rose x3 🎁")
 
 </body>
 </html>
+
+setInterval(()=>{
+
+let name = localStorage.getItem("topgifter")
+let count = localStorage.getItem("topgiftcount")
+
+if(name){
+document.getElementById("gifterName").innerText=name
+document.getElementById("gifterCount").innerText=count
+}
+
+},1000)
